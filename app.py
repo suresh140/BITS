@@ -24,6 +24,7 @@ import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import streamlit as st
 
 file_path = "spambase.csv"
 TARGET = "spam"             # your target column (binary: 0/1)
@@ -111,11 +112,13 @@ def evaluate(models2):
     return output
 
         #print("\nClassification report:\n", classification_report(y_test, y_pred))
-
 op1 = evaluate(Models)
 df = pd.DataFrame(op1)
+metric_df=df.drop(['Confusion'],axis=1)
 df.to_csv("test.csv")
 print(f'After function {op1}')
+st.table(metric_df)
+
 
 # ---------------------------------------------------------- evaluate
 
