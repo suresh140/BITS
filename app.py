@@ -10,6 +10,8 @@
 #4. Naive Bayes Classifier - Gaussian or Multinomial
 #5. Support Vector Machine
 import os
+
+from pathlib import Path
 import pickle
 import warnings
 import pandas as pd
@@ -25,6 +27,9 @@ from kagglehub import KaggleDatasetAdapter
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import streamlit as st
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_DIR = BASE_DIR / "model"
 
 file_path = "spambase.csv"
 TARGET = "spam"             # your target column (binary: 0/1)
@@ -85,7 +90,7 @@ Models = {"lr":model1,"dtree":model2,"knn":model3,"naivebaiyes":model4,"svm":mod
 def fit_model(models1):
     for name in models1:
         models1[name].fit(X_train,y_train)
-        str = "model/"+name
+        str = "model/"+name+".pkl"
         with open(str, "wb") as f:
             pickle.dump(models1[name], f)
 
@@ -118,6 +123,34 @@ metric_df=df.drop(['Confusion'],axis=1)
 df.to_csv("test.csv")
 print(f'After function {op1}')
 st.table(metric_df)
+
+@st.cache_resource
+
+
+
+def load_model(filename):
+    with open(MODEL_DIR/filename, "rb") as f:
+        return pickle.load(f)
+
+
+
+models = {
+    "Logistic Regression": load_model("lr.pkl"),
+    "Decision Tree": load_model("dtree.pkl"),
+    "KNN": load_model("knn.pkl"),
+    "Naive Baiyes": load_model("naivebaiyes.pkl"),
+    "SVM": load_model("svm.pkl"),
+}
+
+choice = st.selectbox("Choose model", list(models))
+
+uploaded = st.file_uploader("Upload CSV for prediction", type="csv")
+if uploaded:
+    new_df = pd.read_csv(uploaded)
+    preds = models[choice].predict(new_df)
+    out = new_df.copy()
+    out["Prediction"] = preds
+    st.dataframe(out)
 
 
 # ---------------------------------------------------------- evaluate
