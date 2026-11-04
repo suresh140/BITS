@@ -120,7 +120,8 @@ def evaluate(models2):
 op1 = evaluate(Models)
 df = pd.DataFrame(op1)
 metric_df=df.drop(['Confusion'],axis=1)
-df.to_csv("test.csv")
+df.to_csv("metrics.csv")
+
 print(f'After function {op1}')
 st.table(metric_df)
 
@@ -151,8 +152,4 @@ if uploaded:
     out = new_df.copy()
     out["Prediction"] = preds
     st.dataframe(out)
-
-
-# ---------------------------------------------------------- evaluate
-
 
